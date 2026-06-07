@@ -1140,10 +1140,10 @@ export default function App() {
               <div className="flex justify-between items-center">
                 <span className="text-xs text-white/40">Account Number</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-lg">1970488179</span>
+                  <span className="font-mono font-bold text-lg">8114925973</span>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText('1970488179');
+                      navigator.clipboard.writeText('8114925973');
                       triggerToast('Account number copied!', 'success');
                     }}
                     className="text-white/40 hover:text-white transition-colors"
@@ -1155,10 +1155,10 @@ export default function App() {
               <div className="flex justify-between items-center">
                 <span className="text-xs text-white/40">Bank Name</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold">Access Bank</span>
+                  <span className="font-bold">Moniepoint</span>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText('Access Bank');
+                      navigator.clipboard.writeText('Moniepoint');
                       triggerToast('Bank name copied!', 'success');
                     }}
                     className="text-white/40 hover:text-white transition-colors"
@@ -1170,10 +1170,10 @@ export default function App() {
               <div className="flex justify-between items-center">
                 <span className="text-xs text-white/40">Account Name</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold">OHI ABDULSALAM</span>
+                  <span className="font-bold">Godspower</span>
                   <button 
                     onClick={() => {
-                      navigator.clipboard.writeText('OHI ABDULSALAM');
+                      navigator.clipboard.writeText('Godspower');
                       triggerToast('Account name copied!', 'success');
                     }}
                     className="text-white/40 hover:text-white transition-colors"
