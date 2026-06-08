@@ -296,13 +296,8 @@ export default function App() {
     }
     setPaymentStatus('confirming');
     setTimeout(() => {
-      setPaymentStatus('success');
-      if (user) {
-        const updatedUser = { ...user, isPrime: true, primeCode: 'primeABC' };
-        setUser(updatedUser);
-        localStorage.setItem('prime_pay_user', JSON.stringify(updatedUser));
-        triggerToast('Payment proof verified! Prime Code generated.', 'success');
-      }
+      setPaymentStatus('failed');
+      triggerToast('Verification failed. Unable to verify your payment proof.', 'error');
     }, 2500);
   };
 
