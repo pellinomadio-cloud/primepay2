@@ -6,6 +6,7 @@ export interface User {
   isLoggedIn: boolean;
   isPrime?: boolean;
   primeCode?: string;
+  hasClaimedTelegramBonus?: boolean;
 }
 
 export interface Question {

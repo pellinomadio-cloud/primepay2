@@ -27,7 +27,7 @@ import { QUESTIONS } from './constants';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<'auth' | 'dashboard' | 'game' | 'profile' | 'buy_prime' | 'history' | 'withdraw' | 'airtime' | 'data'>('auth');
+  const [view, setView] = useState<'auth' | 'dashboard' | 'game' | 'profile' | 'buy_prime' | 'history' | 'withdraw' | 'airtime' | 'data' | 'earn'>('auth');
   const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [withdrawData, setWithdrawData] = useState({ bank: '', account: '', name: '', amount: '', code: '' });
@@ -44,6 +44,8 @@ export default function App() {
   const [gameStatus, setGameStatus] = useState<'playing' | 'finished' | 'idle'>('idle');
   const [lastReward, setLastReward] = useState(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [isClaimingBonus, setIsClaimingBonus] = useState(false);
+  const [hasClickedJoinTelegram, setHasClickedJoinTelegram] = useState(false);
 
   // Customized non-blocking notification state
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -243,6 +245,39 @@ export default function App() {
       
       triggerToast('Congratulations! You have claimed ₦30,000.', 'success');
     }
+  };
+
+  const handleClaimTelegramBonus = () => {
+    if (!user) return;
+    if (user.hasClaimedTelegramBonus) {
+      triggerToast('You have already claimed this ₦109,000 Telegram Bonus!', 'info');
+      return;
+    }
+    if (!hasClickedJoinTelegram) {
+      triggerToast('Please join our Telegram channel first!', 'error');
+      return;
+    }
+
+    setIsClaimingBonus(true);
+    setTimeout(() => {
+      const amount = 109000;
+      const updatedUser = { ...user, balance: user.balance + amount, hasClaimedTelegramBonus: true };
+      setUser(updatedUser);
+      localStorage.setItem('prime_pay_user', JSON.stringify(updatedUser));
+
+      const newTransaction = {
+        title: 'Telegram Bonus',
+        amount: `+₦${amount.toLocaleString()}`,
+        time: 'Just now',
+        type: 'earn'
+      };
+      const updatedTransactions = [newTransaction, ...transactions];
+      setTransactions(updatedTransactions);
+      localStorage.setItem('prime_pay_transactions', JSON.stringify(updatedTransactions));
+
+      setIsClaimingBonus(false);
+      triggerToast('Congratulations! ₦109,000 has been added to your balance.', 'success');
+    }, 2000);
   };
 
   const handleAnswer = (optionIndex: number) => {
@@ -585,12 +620,12 @@ export default function App() {
               </a>
               <div className="flex flex-col items-center gap-2">
                 <button 
-                  onClick={handleDailyClaim}
+                  onClick={() => setView('earn')}
                   className="w-12 h-12 rounded-full bg-prime-orange/10 flex items-center justify-center text-prime-orange hover:bg-prime-orange/20 transition-colors cursor-pointer"
                 >
                   <Trophy size={20} />
                 </button>
-                <span className="text-[10px] text-white/60">Earn</span>
+                <span className="text-[10px] text-white/60 font-medium">Earn</span>
               </div>
               <div className="flex flex-col items-center gap-2">
                 <button 
@@ -1302,6 +1337,102 @@ export default function App() {
             </button>
             <button className="text-white/40"><TrendingUp size={24} /></button>
             <button onClick={() => setView('profile')} className="text-white/40"><UserIcon size={24} /></button>
+          </div>
+        </nav>
+        {renderToast()}
+      </div>
+    );
+  }
+
+  if (view === 'earn' && user) {
+    return (
+      <div className="min-h-screen bg-prime-blue pb-24 relative">
+        <header className="p-6 flex items-center gap-4 sticky top-0 bg-prime-blue/80 backdrop-blur-md z-20">
+          <button 
+            onClick={() => setView('dashboard')}
+            className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors"
+          >
+            <ChevronRight className="rotate-180 text-white" />
+          </button>
+          <h1 className="text-xl font-display font-bold">Earn Telegram Bonus</h1>
+        </header>
+
+        <main className="px-6 space-y-6 max-w-md mx-auto">
+          <section className="glass-card p-6 text-center space-y-4">
+            <div className="w-20 h-20 rounded-full bg-prime-orange/10 flex items-center justify-center text-prime-orange mx-auto shadow-lg shadow-prime-orange/5 animate-pulse">
+              <Trophy size={42} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-1">₦109,000 Telegram Bonus</h2>
+              <p className="text-white/60 text-sm">Join the official @chix9jacom Telegram channel to unlock your exclusive premium bonus!</p>
+            </div>
+          </section>
+
+          <section className="glass-card p-6 space-y-6">
+            <div className="space-y-4">
+              <h3 className="font-bold text-white/80 text-sm uppercase tracking-wider">Instructions:</h3>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3 text-sm text-white/80">
+                  <div className="w-6 h-6 rounded-full bg-prime-orange/20 border border-prime-orange/30 flex items-center justify-center text-xs font-bold text-prime-orange shrink-0">1</div>
+                  <p>Click the <strong className="text-white">Join Channel</strong> button below to open Telegram.</p>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-white/80">
+                  <div className="w-6 h-6 rounded-full bg-prime-orange/20 border border-prime-orange/30 flex items-center justify-center text-xs font-bold text-prime-orange shrink-0">2</div>
+                  <p>Subscribe / Join the <strong className="text-prime-orange">@chix9jacom</strong> channel.</p>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-white/80">
+                  <div className="w-6 h-6 rounded-full bg-prime-orange/20 border border-prime-orange/30 flex items-center justify-center text-xs font-bold text-prime-orange shrink-0">3</div>
+                  <p>Return here and tap <strong className="text-white">Claim Bonus</strong> to receive ₦109,000 instantly!</p>
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <a 
+                href="https://t.me/chix9jacom"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setHasClickedJoinTelegram(true)}
+                className="w-full bg-[#229ED9] hover:bg-[#1d8dbf] text-white py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 cursor-pointer transition-all shadow-lg shadow-[#229ED9]/15 active:scale-[0.98]"
+              >
+                Join Telegram Channel (@chix9jacom)
+              </a>
+
+              {user.hasClaimedTelegramBonus ? (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 p-5 rounded-2xl text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <p className="text-sm font-bold text-emerald-400">Bonus Claimed Successfully!</p>
+                  <p className="text-xs text-white/50">₦109,000 has been credited to your available balance.</p>
+                </div>
+              ) : (
+                <button 
+                  onClick={handleClaimTelegramBonus}
+                  disabled={isClaimingBonus}
+                  className="w-full prime-gradient py-4 rounded-2xl font-bold text-lg disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
+                >
+                  {isClaimingBonus ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Verifying Subscription...
+                    </>
+                  ) : 'Claim ₦109,000 Bonus'}
+                </button>
+              )}
+            </div>
+          </section>
+        </main>
+
+        <nav className="fixed bottom-0 left-0 right-0 p-4 z-30">
+          <div className="max-w-md mx-auto glass-card py-4 px-8 flex justify-between items-center shadow-2xl border-white/5">
+            <button onClick={() => setView('dashboard')} className="text-white/40 cursor-pointer"><Wallet size={24} /></button>
+            <button onClick={() => setView('history')} className="text-white/40 cursor-pointer"><History size={24} /></button>
+            <button onClick={startNewGame} className="w-14 h-14 prime-gradient rounded-full flex items-center justify-center shadow-lg shadow-prime-purple/40 -mt-12 border-4 border-prime-blue cursor-pointer">
+              <Gamepad2 size={28} />
+            </button>
+            <button className="text-white/40 cursor-pointer"><TrendingUp size={24} /></button>
+            <button onClick={() => setView('profile')} className="text-white/40 cursor-pointer"><UserIcon size={24} /></button>
           </div>
         </nav>
         {renderToast()}
